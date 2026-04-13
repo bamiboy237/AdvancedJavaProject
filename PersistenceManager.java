@@ -14,8 +14,8 @@ public class PersistenceManager {
 
     private Path dataDir;
 
-    public PersistenceManager(Path dataDir) {
-        this.dataDir = dataDir;
+    public PersistenceManager(Path dataDirectory) {
+        this.dataDir = dataDirectory;
         if (!Files.exists(dataDir)) {
             try {
                 Files.createDirectories(dataDir);

@@ -40,6 +40,9 @@ public class ProfileIndex implements Serializable {
         if (profile == null) {
             throw new IllegalArgumentException("Profile cannot be null");
         }
+        if (profiles.contains(profile)) {
+            throw new IllegalArgumentException("Profile already exists");
+        }
         try {
             profiles.add(profile);
         } catch (Exception e) {

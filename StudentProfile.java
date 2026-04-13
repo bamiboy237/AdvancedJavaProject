@@ -13,11 +13,13 @@ public class StudentProfile implements Serializable {
     private String firstName;
     private String lastName;
     private String studentId;
+    private StudentRecord record;
 
-    public StudentProfile(String firstName, String lastName, String studentId) {
+    public StudentProfile(String firstName, String lastName, String studentId, StudentRecord record) {
         this.firstName = firstName == null ? "" : firstName.trim();
         this.lastName = lastName == null ? "" : lastName.trim();
         this.studentId = studentId;
+        this.record = record;
     }
 
     public StudentProfile(
@@ -25,7 +27,7 @@ public class StudentProfile implements Serializable {
         String lastName,
         ProfileIndex index
     ) {
-        this(firstName, lastName, StudentIdGenerator.generateNextId(index));
+        this(firstName, lastName, StudentIdGenerator.generateNextId(index), new StudentRecord());
     }
 
     public String getFirstName() {
@@ -42,6 +44,14 @@ public class StudentProfile implements Serializable {
 
     public void setLastName(String lastName) {
         this.lastName = lastName == null ? "" : lastName.trim();
+    }
+
+    public StudentRecord getRecord() {
+        return record;
+    }
+
+    public void setRecord(StudentRecord record) {
+        this.record = record;
     }
 
     public String getStudentId() {

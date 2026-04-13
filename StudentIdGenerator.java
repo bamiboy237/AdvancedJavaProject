@@ -3,11 +3,8 @@
  * Student ID generator for local student profiles.
  */
 
-import java.io.Serializable;
+public final class StudentIdGenerator {
 
-public final class StudentIdGenerator implements Serializable {
-
-    private static final long serialVersionUID = 1L;
     private static final String PREFIX = "STU-";
     private static final int START_NUMBER = 1001;
 
