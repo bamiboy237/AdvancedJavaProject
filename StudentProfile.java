@@ -22,14 +22,6 @@ public class StudentProfile implements Serializable {
         this.record = record;
     }
 
-    public StudentProfile(
-        String firstName,
-        String lastName,
-        ProfileIndex index
-    ) {
-        this(firstName, lastName, StudentIdGenerator.generateNextId(index), new StudentRecord());
-    }
-
     public String getFirstName() {
         return firstName;
     }
