@@ -8,12 +8,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 
 public final class UITheme {
+
     public static final Color BACKGROUND = Color.WHITE;
     public static final Color SURFACE = Color.WHITE;
     public static final Color TEXT = new Color(34, 34, 34);
@@ -28,12 +26,7 @@ public final class UITheme {
     public static final Font BODY_FONT = new Font("Georgia", Font.PLAIN, 15);
     public static final Font BUTTON_FONT = new Font("Georgia", Font.BOLD, 14);
 
-    private UITheme() {
-    }
-
-    public static Border panelPadding(int top, int left, int bottom, int right) {
-        return new EmptyBorder(top, left, bottom, right);
-    }
+    private UITheme() {}
 
     public static void stylePrimaryButton(JButton button) {
         styleButton(button, PRIMARY, Color.WHITE);
@@ -59,7 +52,11 @@ public final class UITheme {
         );
     }
 
-    private static void styleButton(JButton button, Color background, Color foreground) {
+    private static void styleButton(
+        JButton button,
+        Color background,
+        Color foreground
+    ) {
         button.setFont(BUTTON_FONT);
         button.setBackground(background);
         button.setForeground(foreground);

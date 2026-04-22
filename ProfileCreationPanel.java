@@ -103,12 +103,6 @@ public class ProfileCreationPanel extends JPanel {
         return studentLastNameField.getText().trim();
     }
 
-    public String getStudentName() {
-        String firstName = getStudentFirstName();
-        String lastName = getStudentLastName();
-        return (firstName + " " + lastName).trim();
-    }
-
     public void clearFields() {
         studentFirstNameField.setText("");
         studentLastNameField.setText("");

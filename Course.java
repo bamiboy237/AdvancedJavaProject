@@ -4,6 +4,7 @@
  */
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -16,6 +17,7 @@ public class Course implements Serializable {
     private String description;
     private String[] topics;
     private String[] assignments;
+    private ArrayList<CalendarEvent> deadlines;
     private String instructor;
 
     public Course(
@@ -26,12 +28,34 @@ public class Course implements Serializable {
         String[] assignments,
         String instructor
     ) {
+        this(
+            courseId,
+            title,
+            description,
+            topics,
+            assignments,
+            new ArrayList<>(),
+            instructor
+        );
+    }
+
+    public Course(
+        String courseId,
+        String title,
+        String description,
+        String[] topics,
+        String[] assignments,
+        ArrayList<CalendarEvent> deadlines,
+        String instructor
+    ) {
         this.courseId = courseId;
         this.title = title;
         this.description = description;
         this.topics = topics == null ? new String[0] : topics.clone();
         this.assignments =
             assignments == null ? new String[0] : assignments.clone();
+        this.deadlines =
+            deadlines == null ? new ArrayList<>() : new ArrayList<>(deadlines);
         this.instructor = instructor;
     }
 
@@ -53,6 +77,13 @@ public class Course implements Serializable {
 
     public String[] getAssignments() {
         return assignments.clone();
+    }
+
+    public ArrayList<CalendarEvent> getDeadlines() {
+        if (deadlines == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(deadlines);
     }
 
     public String getInstructor() {

@@ -3,10 +3,10 @@
  * Home panel for the active student profile dashboard.
  */
 
-import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 
 public class HomePanel extends JPanel {
 
@@ -20,6 +20,10 @@ public class HomePanel extends JPanel {
     private JList<Course> enrolledCoursesList;
     private JButton manageCoursesButton;
     private JButton openCourseButton;
+    private JButton openCalendarButton;
+    private JLabel upcomingDeadlinesLabel;
+    private DefaultListModel<CalendarEvent> upcomingDeadlinesModel;
+    private JList<CalendarEvent> upcomingDeadlinesList;
 
     private DefaultListModel<Course> coursesListModel;
 
@@ -50,17 +54,21 @@ public class HomePanel extends JPanel {
         JPanel welcomePanel = new JPanel();
         welcomePanel.setLayout(new BoxLayout(welcomePanel, BoxLayout.Y_AXIS));
         welcomePanel.setBackground(UITheme.SURFACE);
-        welcomePanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(UITheme.BORDER),
-            new EmptyBorder(20, 20, 20, 20)
-        ));
+        welcomePanel.setBorder(
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(UITheme.BORDER),
+                new EmptyBorder(20, 20, 20, 20)
+            )
+        );
 
         welcomeLabel = new JLabel("Welcome back!");
         welcomeLabel.setFont(UITheme.SECTION_FONT);
         welcomeLabel.setForeground(UITheme.TEXT);
         welcomeLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        enrollmentCountLabel = new JLabel("You are not enrolled in any courses");
+        enrollmentCountLabel = new JLabel(
+            "You are not enrolled in any courses"
+        );
         enrollmentCountLabel.setFont(UITheme.BODY_FONT);
         enrollmentCountLabel.setForeground(UITheme.MUTED_TEXT);
         enrollmentCountLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -79,7 +87,7 @@ public class HomePanel extends JPanel {
         UITheme.stylePrimaryButton(manageCoursesButton);
         manageCoursesButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         manageCoursesButton.setMaximumSize(new Dimension(200, 40));
-        manageCoursesButton.addActionListener(e -> parentFrame.showCard("courseManagement"));
+        manageCoursesButton.addActionListener(this::handleManageCourses);
 
         buttonPanel.add(manageCoursesButton);
 
@@ -98,19 +106,25 @@ public class HomePanel extends JPanel {
         enrolledCoursesList = new JList<>(coursesListModel);
         enrolledCoursesList.setFont(UITheme.BODY_FONT);
         enrolledCoursesList.setForeground(UITheme.TEXT);
-        enrolledCoursesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        enrolledCoursesList.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION
+        );
         enrolledCoursesList.setCellRenderer(new CourseListCellRenderer());
 
         JScrollPane coursesScrollPane = new JScrollPane(enrolledCoursesList);
-        coursesScrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
+        coursesScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
         coursesScrollPane.getViewport().setBackground(UITheme.SURFACE);
 
-        JPanel coursesButtonPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        JPanel coursesButtonPanel = new JPanel(
+            new FlowLayout(FlowLayout.LEFT, 0, 0)
+        );
         coursesButtonPanel.setBackground(UITheme.BACKGROUND);
 
         openCourseButton = new JButton("Open Course");
         UITheme.stylePrimaryButton(openCourseButton);
-        openCourseButton.addActionListener(e -> openSelectedCourse());
+        openCourseButton.addActionListener(this::handleOpenCourse);
 
         coursesButtonPanel.add(openCourseButton);
 
@@ -123,17 +137,55 @@ public class HomePanel extends JPanel {
         JPanel eventsPanel = new JPanel(new BorderLayout(0, 10));
         eventsPanel.setBackground(UITheme.BACKGROUND);
 
+        JPanel eventsHeaderPanel = new JPanel(new BorderLayout(10, 0));
+        eventsHeaderPanel.setBackground(UITheme.BACKGROUND);
+
         JLabel eventsTitleLabel = new JLabel("Upcoming Deadlines");
         eventsTitleLabel.setFont(UITheme.SECTION_FONT);
         eventsTitleLabel.setForeground(UITheme.TEXT);
 
-        JLabel placeholderLabel = new JLabel("Calendar integration - to be implemented");
-        placeholderLabel.setFont(UITheme.BODY_FONT);
-        placeholderLabel.setForeground(UITheme.MUTED_TEXT);
-        placeholderLabel.setBorder(new EmptyBorder(20, 10, 20, 10));
+        upcomingDeadlinesLabel = new JLabel(
+            "No course or calendar deadlines yet"
+        );
+        upcomingDeadlinesLabel.setFont(UITheme.BODY_FONT);
+        upcomingDeadlinesLabel.setForeground(UITheme.MUTED_TEXT);
 
-        eventsPanel.add(eventsTitleLabel, BorderLayout.NORTH);
-        eventsPanel.add(placeholderLabel, BorderLayout.CENTER);
+        eventsHeaderPanel.add(eventsTitleLabel, BorderLayout.WEST);
+        eventsHeaderPanel.add(upcomingDeadlinesLabel, BorderLayout.EAST);
+
+        upcomingDeadlinesModel = new DefaultListModel<>();
+        upcomingDeadlinesList = new JList<>(upcomingDeadlinesModel);
+        upcomingDeadlinesList.setFont(UITheme.BODY_FONT);
+        upcomingDeadlinesList.setForeground(UITheme.TEXT);
+        upcomingDeadlinesList.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION
+        );
+        upcomingDeadlinesList.setCellRenderer(new DeadlineListCellRenderer());
+        upcomingDeadlinesList.addListSelectionListener(
+            this::handleUpcomingDeadlineSelectionChanged
+        );
+
+        JScrollPane deadlinesScrollPane = new JScrollPane(
+            upcomingDeadlinesList
+        );
+        deadlinesScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
+        deadlinesScrollPane.getViewport().setBackground(UITheme.SURFACE);
+
+        openCalendarButton = new JButton("Open Calendar");
+        UITheme.stylePrimaryButton(openCalendarButton);
+        openCalendarButton.addActionListener(this::handleOpenCalendar);
+
+        JPanel eventsButtonPanel = new JPanel(
+            new FlowLayout(FlowLayout.LEFT, 0, 0)
+        );
+        eventsButtonPanel.setBackground(UITheme.BACKGROUND);
+        eventsButtonPanel.add(openCalendarButton);
+
+        eventsPanel.add(eventsHeaderPanel, BorderLayout.NORTH);
+        eventsPanel.add(deadlinesScrollPane, BorderLayout.CENTER);
+        eventsPanel.add(eventsButtonPanel, BorderLayout.SOUTH);
 
         add(eventsPanel, BorderLayout.SOUTH);
     }
@@ -149,12 +201,22 @@ public class HomePanel extends JPanel {
             welcomeLabel.setText("Welcome!");
             enrollmentCountLabel.setText("No profile selected");
             coursesListModel.clear();
+            if (upcomingDeadlinesModel != null) {
+                upcomingDeadlinesModel.clear();
+            }
+            if (upcomingDeadlinesLabel != null) {
+                upcomingDeadlinesLabel.setText(
+                    "No course or calendar deadlines yet"
+                );
+            }
             return;
         }
 
         String fullName = currentProfile.getStudentName();
         String studentId = currentProfile.getStudentId();
-        signedInInfoLabel.setText("Signed in as: " + fullName + " (" + studentId + ")");
+        signedInInfoLabel.setText(
+            "Signed in as: " + fullName + " (" + studentId + ")"
+        );
         welcomeLabel.setText("Welcome, " + fullName + "!");
 
         StudentRecord record = currentProfile.getRecord();
@@ -163,7 +225,9 @@ public class HomePanel extends JPanel {
             int courseCount = enrolledCourses.size();
 
             if (courseCount == 0) {
-                enrollmentCountLabel.setText("You are not enrolled in any courses");
+                enrollmentCountLabel.setText(
+                    "You are not enrolled in any courses"
+                );
                 coursesListModel.clear();
             } else if (courseCount == 1) {
                 enrollmentCountLabel.setText("You are enrolled in 1 course");
@@ -172,13 +236,70 @@ public class HomePanel extends JPanel {
                     coursesListModel.addElement(course);
                 }
             } else {
-                enrollmentCountLabel.setText("You are enrolled in " + courseCount + " courses");
+                enrollmentCountLabel.setText(
+                    "You are enrolled in " + courseCount + " courses"
+                );
                 coursesListModel.clear();
                 for (Course course : enrolledCourses) {
                     coursesListModel.addElement(course);
                 }
             }
+
+            refreshUpcomingDeadlines(record.getCalendarEvents());
+        } else {
+            if (upcomingDeadlinesModel != null) {
+                upcomingDeadlinesModel.clear();
+            }
+            if (upcomingDeadlinesLabel != null) {
+                upcomingDeadlinesLabel.setText(
+                    "No course or calendar deadlines yet"
+                );
+            }
         }
+    }
+
+    private void refreshUpcomingDeadlines(ArrayList<CalendarEvent> events) {
+        if (upcomingDeadlinesModel == null || upcomingDeadlinesLabel == null) {
+            return;
+        }
+
+        upcomingDeadlinesModel.clear();
+        if (events == null || events.isEmpty()) {
+            upcomingDeadlinesLabel.setText(
+                "No course or calendar deadlines yet"
+            );
+            return;
+        }
+
+        int limit = Math.min(5, events.size());
+        for (int i = 0; i < limit; i++) {
+            upcomingDeadlinesModel.addElement(events.get(i));
+        }
+        upcomingDeadlinesLabel.setText(events.size() + " total upcoming");
+    }
+
+    private void handleManageCourses(java.awt.event.ActionEvent event) {
+        parentFrame.showCard("courseManagement");
+    }
+
+    private void handleOpenCourse(java.awt.event.ActionEvent event) {
+        openSelectedCourse();
+    }
+
+    private void handleUpcomingDeadlineSelectionChanged(
+        javax.swing.event.ListSelectionEvent event
+    ) {
+        if (!event.getValueIsAdjusting()) {
+            CalendarEvent selectedEvent =
+                upcomingDeadlinesList.getSelectedValue();
+            if (selectedEvent != null) {
+                parentFrame.showCard("calendar");
+            }
+        }
+    }
+
+    private void handleOpenCalendar(java.awt.event.ActionEvent event) {
+        parentFrame.showCard("calendar");
     }
 
     private void openSelectedCourse() {
@@ -195,7 +316,65 @@ public class HomePanel extends JPanel {
         parentFrame.openCourse(selectedCourse);
     }
 
-    private static class CourseListCellRenderer extends JPanel implements ListCellRenderer<Course> {
+    private static class DeadlineListCellRenderer
+        extends JPanel
+        implements ListCellRenderer<CalendarEvent>
+    {
+
+        private final JLabel titleLabel;
+        private final JLabel dateLabel;
+
+        DeadlineListCellRenderer() {
+            setLayout(new BorderLayout(10, 0));
+            setBorder(new EmptyBorder(10, 10, 10, 10));
+            setBackground(UITheme.SURFACE);
+
+            titleLabel = new JLabel();
+            titleLabel.setFont(UITheme.BODY_FONT);
+            titleLabel.setForeground(UITheme.TEXT);
+
+            dateLabel = new JLabel();
+            dateLabel.setFont(new Font("Georgia", Font.PLAIN, 12));
+            dateLabel.setForeground(UITheme.MUTED_TEXT);
+            dateLabel.setHorizontalAlignment(SwingConstants.RIGHT);
+
+            add(titleLabel, BorderLayout.CENTER);
+            add(dateLabel, BorderLayout.EAST);
+        }
+
+        @Override
+        public Component getListCellRendererComponent(
+            JList<? extends CalendarEvent> list,
+            CalendarEvent event,
+            int index,
+            boolean isSelected,
+            boolean cellHasFocus
+        ) {
+            titleLabel.setText(event == null ? "" : event.getTitle());
+            dateLabel.setText(
+                event == null || event.getSortDateTime() == null
+                    ? ""
+                    : event.getSortDateTime().toLocalDate().toString()
+            );
+
+            if (isSelected) {
+                setBackground(UITheme.PRIMARY);
+                titleLabel.setForeground(Color.WHITE);
+                dateLabel.setForeground(Color.WHITE);
+            } else {
+                setBackground(UITheme.SURFACE);
+                titleLabel.setForeground(UITheme.TEXT);
+                dateLabel.setForeground(UITheme.MUTED_TEXT);
+            }
+            return this;
+        }
+    }
+
+    private static class CourseListCellRenderer
+        extends JPanel
+        implements ListCellRenderer<Course>
+    {
+
         private JLabel courseIdLabel;
         private JLabel courseNameLabel;
         private JLabel instructorLabel;
@@ -230,8 +409,13 @@ public class HomePanel extends JPanel {
         }
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends Course> list, Course course,
-                int index, boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(
+            JList<? extends Course> list,
+            Course course,
+            int index,
+            boolean isSelected,
+            boolean cellHasFocus
+        ) {
             courseIdLabel.setText(course.getCourseId());
             courseNameLabel.setText(course.getTitle());
             instructorLabel.setText(course.getInstructor());

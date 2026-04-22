@@ -5,6 +5,7 @@
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class StudentRecord implements Serializable {
 
@@ -17,6 +18,22 @@ public class StudentRecord implements Serializable {
         this.calendarEvents = new ArrayList<>();
     }
 
+    private ArrayList<CalendarEvent> collectCourseDeadlines() {
+        ArrayList<CalendarEvent> deadlines = new ArrayList<>();
+        try {
+            for (Course course : enrolledCourses) {
+                if (course == null) {
+                    continue;
+                }
+                deadlines.addAll(course.getDeadlines());
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to collect course deadlines", e);
+        }
+        Collections.sort(deadlines);
+        return deadlines;
+    }
+
     public ArrayList<Course> getEnrolledCourses() {
         try {
             return new ArrayList<>(enrolledCourses);
@@ -25,6 +42,30 @@ public class StudentRecord implements Serializable {
                 "Failed to retrieve enrolled courses",
                 e
             );
+        }
+    }
+
+    public void syncCoursesFromCatalog(CourseCatalog courseCatalog) {
+        if (courseCatalog == null) {
+            throw new IllegalArgumentException("Course catalog cannot be null");
+        }
+        try {
+            ArrayList<Course> syncedCourses = new ArrayList<>();
+            for (Course enrolledCourse : enrolledCourses) {
+                if (enrolledCourse == null) {
+                    continue;
+                }
+                Course catalogCourse = courseCatalog.getCourseById(
+                    enrolledCourse.getCourseId()
+                );
+                syncedCourses.add(
+                    catalogCourse == null ? enrolledCourse : catalogCourse
+                );
+            }
+            enrolledCourses.clear();
+            enrolledCourses.addAll(syncedCourses);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to sync enrolled courses", e);
         }
     }
 
@@ -67,9 +108,23 @@ public class StudentRecord implements Serializable {
         }
     }
 
-    public ArrayList<CalendarEvent> getCalendarEvents() {
+    public ArrayList<CalendarEvent> getImportedCalendarEvents() {
         try {
             return new ArrayList<>(calendarEvents);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                "Failed to retrieve imported calendar events",
+                e
+            );
+        }
+    }
+
+    public ArrayList<CalendarEvent> getCalendarEvents() {
+        try {
+            ArrayList<CalendarEvent> events = getImportedCalendarEvents();
+            events.addAll(collectCourseDeadlines());
+            Collections.sort(events);
+            return events;
         } catch (Exception e) {
             throw new RuntimeException("Failed to retrieve calendar events", e);
         }

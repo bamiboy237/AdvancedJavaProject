@@ -64,7 +64,4 @@ public class WelcomePanel extends JPanel {
         return signUpButton;
     }
 
-    public JLabel getTitleLabel() {
-        return titleLabel;
-    }
 }

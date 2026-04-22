@@ -5,7 +5,6 @@
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Path;
@@ -58,7 +57,10 @@ public class MiniLMSFrame extends JFrame {
         profileIndexPath = dataDirectory.resolve("profiles.ser");
         persistenceManager = new PersistenceManager(dataDirectory);
         profileIndex = persistenceManager.loadProfileIndex(profileIndexPath);
-        profileService = new ProfileService(persistenceManager, profileIndexPath);
+        profileService = new ProfileService(
+            persistenceManager,
+            profileIndexPath
+        );
         courseCatalog = new CourseCatalog();
         icsParser = new ICSParser();
 
@@ -87,12 +89,18 @@ public class MiniLMSFrame extends JFrame {
         centerPanel.add(calendarPanel, CALENDAR_CARD);
         centerPanel.setBackground(UITheme.BACKGROUND);
 
-        welcomePanel.getSignInButton().addActionListener(showProfileSelection());
+        welcomePanel
+            .getSignInButton()
+            .addActionListener(showProfileSelection());
         welcomePanel.getSignUpButton().addActionListener(showProfileCreation());
         profileSelectionPanel.getBackButton().addActionListener(showWelcome());
         profileCreationPanel.getBackButton().addActionListener(showWelcome());
-        profileCreationPanel.getCreateProfileButton().addActionListener(createProfile());
-        profileSelectionPanel.getSelectButton().addActionListener(selectProfile());
+        profileCreationPanel
+            .getCreateProfileButton()
+            .addActionListener(createProfile());
+        profileSelectionPanel
+            .getSelectButton()
+            .addActionListener(selectProfile());
 
         buildMenuBar();
 
@@ -106,13 +114,13 @@ public class MiniLMSFrame extends JFrame {
 
         JMenu fileMenu = new JMenu("File");
         JMenuItem signOutItem = new JMenuItem("Sign Out");
-        signOutItem.addActionListener(e -> signOut());
+        signOutItem.addActionListener(this::handleSignOutAction);
         JMenuItem saveProfileItem = new JMenuItem("Save Profile");
-        saveProfileItem.addActionListener(e -> saveCurrentProfile());
+        saveProfileItem.addActionListener(this::handleSaveProfileAction);
         JMenuItem importIcsItem = new JMenuItem("Import ICS");
-        importIcsItem.addActionListener(e -> handleImportIcs());
+        importIcsItem.addActionListener(this::handleImportIcsAction);
         JMenuItem exitItem = new JMenuItem("Exit");
-        exitItem.addActionListener(e -> handleExit());
+        exitItem.addActionListener(this::handleExitAction);
 
         fileMenu.add(signOutItem);
         fileMenu.add(saveProfileItem);
@@ -122,11 +130,13 @@ public class MiniLMSFrame extends JFrame {
 
         JMenu viewMenu = new JMenu("View");
         JMenuItem homeItem = new JMenuItem("Home");
-        homeItem.addActionListener(e -> showCard(HOME_CARD));
+        homeItem.addActionListener(this::handleShowHomeAction);
         JMenuItem courseMgmtItem = new JMenuItem("Course Management");
-        courseMgmtItem.addActionListener(e -> showCard(COURSE_MANAGEMENT_CARD));
+        courseMgmtItem.addActionListener(
+            this::handleShowCourseManagementAction
+        );
         JMenuItem calendarItem = new JMenuItem("Calendar");
-        calendarItem.addActionListener(e -> showCard(CALENDAR_CARD));
+        calendarItem.addActionListener(this::handleShowCalendarAction);
 
         viewMenu.add(homeItem);
         viewMenu.add(courseMgmtItem);
@@ -134,7 +144,7 @@ public class MiniLMSFrame extends JFrame {
 
         JMenu helpMenu = new JMenu("Help");
         JMenuItem aboutItem = new JMenuItem("About");
-        aboutItem.addActionListener(e -> showAboutDialog());
+        aboutItem.addActionListener(this::handleAboutAction);
         helpMenu.add(aboutItem);
 
         menuBar.add(fileMenu);
@@ -150,7 +160,11 @@ public class MiniLMSFrame extends JFrame {
             refreshHomePanel();
         } else if (COURSE_MANAGEMENT_CARD.equals(cardName)) {
             refreshCourseManagement();
-        } else if (COURSE_CONTENT_CARD.equals(cardName) && selectedCourse != null) {
+        } else if (CALENDAR_CARD.equals(cardName)) {
+            calendarPanel.refreshEvents();
+        } else if (
+            COURSE_CONTENT_CARD.equals(cardName) && selectedCourse != null
+        ) {
             courseContentPanel.displayCourse(selectedCourse);
         }
     }
@@ -166,7 +180,9 @@ public class MiniLMSFrame extends JFrame {
 
     public void signInAndShowHome(StudentProfile profile) {
         currentProfile = profile;
+        syncEnrolledCoursesFromCatalog();
         homePanel.setProfile(currentProfile);
+        calendarPanel.refreshEvents();
         showCard(HOME_CARD);
     }
 
@@ -194,7 +210,17 @@ public class MiniLMSFrame extends JFrame {
     public void persistCurrentProfile() {
         if (currentProfile != null) {
             try {
-                persistenceManager.saveProfileIndex(profileIndex, profileIndexPath);
+                Path profilePath = Paths.get("data").resolve(
+                    currentProfile.getStudentId() + ".ser"
+                );
+                persistenceManager.saveStudentProfile(
+                    currentProfile,
+                    profilePath
+                );
+                persistenceManager.saveProfileIndex(
+                    profileIndex,
+                    profileIndexPath
+                );
             } catch (Exception ex) {
                 throw new RuntimeException("Failed to save profile.", ex);
             }
@@ -213,7 +239,9 @@ public class MiniLMSFrame extends JFrame {
         }
 
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileFilter(new FileNameExtensionFilter("ICS Files", "ics"));
+        fileChooser.setFileFilter(
+            new FileNameExtensionFilter("ICS Files", "ics")
+        );
         fileChooser.setDialogTitle("Import ICS File");
 
         int result = fileChooser.showOpenDialog(this);
@@ -297,100 +325,191 @@ public class MiniLMSFrame extends JFrame {
         courseManagementPanel.refreshCourseLists();
     }
 
-    public void refreshCalendarPanel() {
-        calendarPanel.refreshEvents();
+    private void syncEnrolledCoursesFromCatalog() {
+        if (currentProfile == null || currentProfile.getRecord() == null) {
+            return;
+        }
+
+        ArrayList<Course> currentCourses = currentProfile
+            .getRecord()
+            .getEnrolledCourses();
+        ArrayList<Course> syncedCourses = new ArrayList<>();
+
+        for (Course course : currentCourses) {
+            if (course == null) {
+                continue;
+            }
+
+            Course catalogCourse = courseCatalog.getCourseById(
+                course.getCourseId()
+            );
+            if (catalogCourse != null) {
+                syncedCourses.add(catalogCourse);
+            } else {
+                syncedCourses.add(course);
+            }
+        }
+
+        StudentRecord refreshedRecord = new StudentRecord();
+        for (Course course : syncedCourses) {
+            refreshedRecord.addCourse(course);
+        }
+        refreshedRecord.setCalendarEvents(
+            currentProfile.getRecord().getImportedCalendarEvents()
+        );
+        currentProfile.setRecord(refreshedRecord);
     }
 
     private ActionListener showWelcome() {
-        return event -> cardLayout.show(centerPanel, WELCOME_CARD);
+        return this::handleShowWelcomeAction;
     }
 
     private ActionListener showProfileSelection() {
-        return event -> cardLayout.show(centerPanel, PROFILE_SELECTION_CARD);
+        return this::handleShowProfileSelectionAction;
     }
 
     private ActionListener showProfileCreation() {
-        return event -> cardLayout.show(centerPanel, PROFILE_CREATION_CARD);
+        return this::handleShowProfileCreationAction;
     }
 
     private ActionListener createProfile() {
-        return event -> {
-            try {
-                profileCreationPanel.clearStatusMessage();
-                StudentProfile newProfile = profileService.createProfile(
-                    profileIndex,
-                    profileCreationPanel.getStudentFirstName(),
-                    profileCreationPanel.getStudentLastName()
-                );
-                profileCreationPanel.clearFields();
-                profileSelectionPanel.refreshProfiles(profileIndex);
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Profile created successfully!\nStudent ID: " + newProfile.getStudentId(),
-                    "Sign Up",
-                    JOptionPane.INFORMATION_MESSAGE
-                );
-                cardLayout.show(centerPanel, PROFILE_SELECTION_CARD);
-            } catch (IllegalArgumentException ex) {
-                profileCreationPanel.setStatusMessage(ex.getMessage());
-            } catch (RuntimeException ex) {
-                profileCreationPanel.setStatusMessage("Could not create profile right now.");
-            }
-        };
+        return this::handleCreateProfileAction;
     }
 
     private ActionListener selectProfile() {
-        return event -> {
-            StudentProfile selectedProfile = profileSelectionPanel.getSelectedProfile();
-            if (selectedProfile == null) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Please select a profile first.",
-                    "Sign In",
-                    JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
+        return this::handleSelectProfileAction;
+    }
 
-            String enteredId = JOptionPane.showInputDialog(
-                this,
-                "Enter the student ID for " + selectedProfile.getStudentName() + ":",
-                "Sign In",
-                JOptionPane.PLAIN_MESSAGE
+    private void handleSignOutAction(java.awt.event.ActionEvent event) {
+        signOut();
+    }
+
+    private void handleSaveProfileAction(java.awt.event.ActionEvent event) {
+        saveCurrentProfile();
+    }
+
+    private void handleImportIcsAction(java.awt.event.ActionEvent event) {
+        handleImportIcs();
+    }
+
+    private void handleExitAction(java.awt.event.ActionEvent event) {
+        handleExit();
+    }
+
+    private void handleShowHomeAction(java.awt.event.ActionEvent event) {
+        showCard(HOME_CARD);
+    }
+
+    private void handleShowCourseManagementAction(
+        java.awt.event.ActionEvent event
+    ) {
+        showCard(COURSE_MANAGEMENT_CARD);
+    }
+
+    private void handleShowCalendarAction(java.awt.event.ActionEvent event) {
+        showCard(CALENDAR_CARD);
+    }
+
+    private void handleAboutAction(java.awt.event.ActionEvent event) {
+        showAboutDialog();
+    }
+
+    private void handleShowWelcomeAction(java.awt.event.ActionEvent event) {
+        cardLayout.show(centerPanel, WELCOME_CARD);
+    }
+
+    private void handleShowProfileSelectionAction(
+        java.awt.event.ActionEvent event
+    ) {
+        cardLayout.show(centerPanel, PROFILE_SELECTION_CARD);
+    }
+
+    private void handleShowProfileCreationAction(
+        java.awt.event.ActionEvent event
+    ) {
+        cardLayout.show(centerPanel, PROFILE_CREATION_CARD);
+    }
+
+    private void handleCreateProfileAction(java.awt.event.ActionEvent event) {
+        try {
+            profileCreationPanel.clearStatusMessage();
+            StudentProfile newProfile = profileService.createProfile(
+                profileIndex,
+                profileCreationPanel.getStudentFirstName(),
+                profileCreationPanel.getStudentLastName()
             );
-
-            if (enteredId == null) {
-                return;
-            }
-
-            enteredId = enteredId.trim();
-            if (enteredId.isEmpty()) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Student ID cannot be empty.",
-                    "Sign In",
-                    JOptionPane.WARNING_MESSAGE
-                );
-                return;
-            }
-
-            if (!enteredId.equals(selectedProfile.getStudentId())) {
-                JOptionPane.showMessageDialog(
-                    this,
-                    "Invalid student ID.",
-                    "Sign In",
-                    JOptionPane.ERROR_MESSAGE
-                );
-                return;
-            }
-
+            profileCreationPanel.clearFields();
+            profileSelectionPanel.refreshProfiles(profileIndex);
             JOptionPane.showMessageDialog(
                 this,
-                "Signed in as " + selectedProfile.getStudentName() + ".",
-                "Sign In",
+                "Profile created successfully!\nStudent ID: " +
+                    newProfile.getStudentId(),
+                "Sign Up",
                 JOptionPane.INFORMATION_MESSAGE
             );
-            signInAndShowHome(selectedProfile);
-        };
+            cardLayout.show(centerPanel, PROFILE_SELECTION_CARD);
+        } catch (IllegalArgumentException ex) {
+            profileCreationPanel.setStatusMessage(ex.getMessage());
+        } catch (RuntimeException ex) {
+            profileCreationPanel.setStatusMessage(
+                "Could not create profile right now."
+            );
+        }
+    }
+
+    private void handleSelectProfileAction(java.awt.event.ActionEvent event) {
+        StudentProfile selectedProfile =
+            profileSelectionPanel.getSelectedProfile();
+        if (selectedProfile == null) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Please select a profile first.",
+                "Sign In",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        String enteredId = JOptionPane.showInputDialog(
+            this,
+            "Enter the student ID for " +
+                selectedProfile.getStudentName() +
+                ":",
+            "Sign In",
+            JOptionPane.PLAIN_MESSAGE
+        );
+
+        if (enteredId == null) {
+            return;
+        }
+
+        enteredId = enteredId.trim();
+        if (enteredId.isEmpty()) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Student ID cannot be empty.",
+                "Sign In",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+
+        if (!enteredId.equals(selectedProfile.getStudentId())) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Invalid student ID.",
+                "Sign In",
+                JOptionPane.ERROR_MESSAGE
+            );
+            return;
+        }
+
+        JOptionPane.showMessageDialog(
+            this,
+            "Signed in as " + selectedProfile.getStudentName() + ".",
+            "Sign In",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+        signInAndShowHome(selectedProfile);
     }
 }

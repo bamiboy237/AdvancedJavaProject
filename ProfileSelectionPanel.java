@@ -5,7 +5,6 @@
 
 import java.awt.*;
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 
 public class ProfileSelectionPanel extends JPanel {
 
@@ -38,24 +37,7 @@ public class ProfileSelectionPanel extends JPanel {
         profileList.setBackground(UITheme.SURFACE);
         profileList.setSelectionBackground(UITheme.PRIMARY);
         profileList.setSelectionForeground(Color.WHITE);
-        profileList.setCellRenderer(
-            (list, value, index, isSelected, cellHasFocus) -> {
-                JLabel label = new JLabel(
-                    value == null ? "" : value.getStudentName()
-                );
-                label.setOpaque(true);
-                label.setFont(UITheme.BODY_FONT);
-                label.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
-                if (isSelected) {
-                    label.setBackground(UITheme.PRIMARY);
-                    label.setForeground(Color.WHITE);
-                } else {
-                    label.setBackground(UITheme.SURFACE);
-                    label.setForeground(UITheme.TEXT);
-                }
-                return label;
-            }
-        );
+        profileList.setCellRenderer(this::renderProfileCell);
 
         JScrollPane scrollPane = new JScrollPane(profileList);
         scrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER, 1));
@@ -82,9 +64,9 @@ public class ProfileSelectionPanel extends JPanel {
         statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
         statusLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        profileList.addListSelectionListener(e -> {
-            selectButton.setEnabled(profileList.getSelectedIndex() >= 0);
-        });
+        profileList.addListSelectionListener(
+            this::handleProfileSelectionChanged
+        );
 
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
@@ -104,6 +86,33 @@ public class ProfileSelectionPanel extends JPanel {
         constraints.gridy = 0;
         constraints.anchor = GridBagConstraints.CENTER;
         add(contentPanel, constraints);
+    }
+
+    private java.awt.Component renderProfileCell(
+        JList<? extends StudentProfile> list,
+        StudentProfile value,
+        int index,
+        boolean isSelected,
+        boolean cellHasFocus
+    ) {
+        JLabel label = new JLabel(value == null ? "" : value.getStudentName());
+        label.setOpaque(true);
+        label.setFont(UITheme.BODY_FONT);
+        label.setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 10));
+        if (isSelected) {
+            label.setBackground(UITheme.PRIMARY);
+            label.setForeground(Color.WHITE);
+        } else {
+            label.setBackground(UITheme.SURFACE);
+            label.setForeground(UITheme.TEXT);
+        }
+        return label;
+    }
+
+    private void handleProfileSelectionChanged(
+        javax.swing.event.ListSelectionEvent event
+    ) {
+        selectButton.setEnabled(profileList.getSelectedIndex() >= 0);
     }
 
     public void refreshProfiles(ProfileIndex index) {
@@ -130,10 +139,6 @@ public class ProfileSelectionPanel extends JPanel {
             return listModel.get(selectedIndex);
         }
         return null;
-    }
-
-    public int getSelectedIndex() {
-        return profileList.getSelectedIndex();
     }
 
     public JButton getSelectButton() {

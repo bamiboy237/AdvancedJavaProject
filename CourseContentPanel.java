@@ -4,7 +4,6 @@
  */
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -23,7 +22,7 @@ import javax.swing.border.EmptyBorder;
 
 public class CourseContentPanel extends JPanel {
 
-    private MiniLMSFrame parentFrame;
+    private final MiniLMSFrame parentFrame;
     private JLabel screenTitleLabel;
     private JLabel helperLabel;
     private JLabel courseTitleLabel;
@@ -44,7 +43,9 @@ public class CourseContentPanel extends JPanel {
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new javax.swing.BoxLayout(headerPanel, javax.swing.BoxLayout.Y_AXIS));
+        headerPanel.setLayout(
+            new javax.swing.BoxLayout(headerPanel, javax.swing.BoxLayout.Y_AXIS)
+        );
         headerPanel.setOpaque(false);
 
         screenTitleLabel = new JLabel("Course Content");
@@ -52,13 +53,21 @@ public class CourseContentPanel extends JPanel {
         screenTitleLabel.setForeground(UITheme.TEXT);
         screenTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        helperLabel = new JLabel("View the selected course title, instructor, description, topics, and assignments.");
+        helperLabel = new JLabel(
+            "View the selected course title, instructor, description, topics, and assignments."
+        );
         helperLabel.setFont(UITheme.BODY_FONT);
         helperLabel.setForeground(UITheme.MUTED_TEXT);
         helperLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         headerPanel.add(screenTitleLabel);
-        headerPanel.add(new javax.swing.Box.Filler(new Dimension(0, 6), new Dimension(0, 6), new Dimension(0, 6)));
+        headerPanel.add(
+            new javax.swing.Box.Filler(
+                new Dimension(0, 6),
+                new Dimension(0, 6),
+                new Dimension(0, 6)
+            )
+        );
         headerPanel.add(helperLabel);
 
         add(headerPanel, BorderLayout.NORTH);
@@ -67,7 +76,12 @@ public class CourseContentPanel extends JPanel {
         bodyPanel.setOpaque(false);
 
         JPanel summaryPanel = new JPanel();
-        summaryPanel.setLayout(new javax.swing.BoxLayout(summaryPanel, javax.swing.BoxLayout.Y_AXIS));
+        summaryPanel.setLayout(
+            new javax.swing.BoxLayout(
+                summaryPanel,
+                javax.swing.BoxLayout.Y_AXIS
+            )
+        );
         summaryPanel.setOpaque(false);
 
         courseTitleLabel = new JLabel("No course selected");
@@ -95,15 +109,35 @@ public class CourseContentPanel extends JPanel {
         descriptionArea.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         JScrollPane descriptionScrollPane = new JScrollPane(descriptionArea);
-        descriptionScrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
+        descriptionScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
         descriptionScrollPane.setPreferredSize(new Dimension(0, 110));
 
         summaryPanel.add(courseTitleLabel);
-        summaryPanel.add(new javax.swing.Box.Filler(new Dimension(0, 6), new Dimension(0, 6), new Dimension(0, 6)));
+        summaryPanel.add(
+            new javax.swing.Box.Filler(
+                new Dimension(0, 6),
+                new Dimension(0, 6),
+                new Dimension(0, 6)
+            )
+        );
         summaryPanel.add(instructorLabel);
-        summaryPanel.add(new javax.swing.Box.Filler(new Dimension(0, 12), new Dimension(0, 12), new Dimension(0, 12)));
+        summaryPanel.add(
+            new javax.swing.Box.Filler(
+                new Dimension(0, 12),
+                new Dimension(0, 12),
+                new Dimension(0, 12)
+            )
+        );
         summaryPanel.add(descriptionLabel);
-        summaryPanel.add(new javax.swing.Box.Filler(new Dimension(0, 8), new Dimension(0, 8), new Dimension(0, 8)));
+        summaryPanel.add(
+            new javax.swing.Box.Filler(
+                new Dimension(0, 8),
+                new Dimension(0, 8),
+                new Dimension(0, 8)
+            )
+        );
         summaryPanel.add(descriptionScrollPane);
 
         JPanel materialsPanel = new JPanel(new GridLayout(1, 2, 16, 0));
@@ -123,7 +157,9 @@ public class CourseContentPanel extends JPanel {
         topicsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane topicsScrollPane = new JScrollPane(topicsList);
-        topicsScrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
+        topicsScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
         topicsScrollPane.getViewport().setBackground(UITheme.SURFACE);
 
         topicsPanel.add(topicsLabel, BorderLayout.NORTH);
@@ -143,7 +179,9 @@ public class CourseContentPanel extends JPanel {
         assignmentsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane assignmentsScrollPane = new JScrollPane(assignmentsList);
-        assignmentsScrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
+        assignmentsScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
         assignmentsScrollPane.getViewport().setBackground(UITheme.SURFACE);
 
         assignmentsPanel.add(assignmentsLabel, BorderLayout.NORTH);
@@ -162,14 +200,20 @@ public class CourseContentPanel extends JPanel {
 
         backHomeButton = new JButton("Back to Home");
         UITheme.stylePrimaryButton(backHomeButton);
-        backHomeButton.addActionListener(e -> parentFrame.showCard("home"));
+        backHomeButton.addActionListener(this::handleBackHome);
 
         backCoursesButton = new JButton("Course Management");
         UITheme.styleSecondaryButton(backCoursesButton);
-        backCoursesButton.addActionListener(e -> parentFrame.showCard("courseManagement"));
+        backCoursesButton.addActionListener(this::handleBackCourses);
 
         buttonPanel.add(backHomeButton);
-        buttonPanel.add(new javax.swing.Box.Filler(new Dimension(10, 0), new Dimension(10, 0), new Dimension(10, 0)));
+        buttonPanel.add(
+            new javax.swing.Box.Filler(
+                new Dimension(10, 0),
+                new Dimension(10, 0),
+                new Dimension(10, 0)
+            )
+        );
         buttonPanel.add(backCoursesButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -189,7 +233,9 @@ public class CourseContentPanel extends JPanel {
         if (currentCourse == null) {
             courseTitleLabel.setText("No course selected");
             instructorLabel.setText("Select a course to view its details.");
-            descriptionArea.setText("Select a course from Home or Course Management.");
+            descriptionArea.setText(
+                "Select a course from Home or Course Management."
+            );
             return;
         }
 
@@ -207,11 +253,11 @@ public class CourseContentPanel extends JPanel {
         }
     }
 
-    public JButton getBackHomeButton() {
-        return backHomeButton;
+    private void handleBackHome(java.awt.event.ActionEvent event) {
+        parentFrame.showCard("home");
     }
 
-    public JButton getBackCoursesButton() {
-        return backCoursesButton;
+    private void handleBackCourses(java.awt.event.ActionEvent event) {
+        parentFrame.showCard("courseManagement");
     }
 }

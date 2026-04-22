@@ -65,7 +65,9 @@ public class CourseManagementPanel extends JPanel {
         setBorder(new EmptyBorder(20, 20, 20, 20));
 
         JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new javax.swing.BoxLayout(headerPanel, javax.swing.BoxLayout.Y_AXIS));
+        headerPanel.setLayout(
+            new javax.swing.BoxLayout(headerPanel, javax.swing.BoxLayout.Y_AXIS)
+        );
         headerPanel.setOpaque(false);
 
         screenTitleLabel = new JLabel("Course Management");
@@ -73,7 +75,9 @@ public class CourseManagementPanel extends JPanel {
         screenTitleLabel.setForeground(UITheme.TEXT);
         screenTitleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        helperLabel = new JLabel("Select a course to preview details, then enroll, drop, or open it.");
+        helperLabel = new JLabel(
+            "Select a course to preview details, then enroll, drop, or open it."
+        );
         helperLabel.setFont(UITheme.BODY_FONT);
         helperLabel.setForeground(UITheme.MUTED_TEXT);
         helperLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -88,38 +92,43 @@ public class CourseManagementPanel extends JPanel {
         availablePanel.setBackground(UITheme.BACKGROUND);
 
         availableCoursesLabel = new JLabel("Available Catalog Courses");
-        availableCoursesLabel.setFont(UITheme.BODY_FONT.deriveFont(Font.BOLD, 16f));
+        availableCoursesLabel.setFont(
+            UITheme.BODY_FONT.deriveFont(Font.BOLD, 16f)
+        );
         availableCoursesLabel.setForeground(UITheme.TEXT);
 
         availableCoursesModel = new DefaultListModel<>();
         availableCoursesList = new JList<>(availableCoursesModel);
-        availableCoursesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        availableCoursesList.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION
+        );
         availableCoursesList.setFont(UITheme.BODY_FONT);
         availableCoursesList.setForeground(UITheme.TEXT);
         availableCoursesList.setCellRenderer(new CourseListCellRenderer());
-        availableCoursesList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && availableCoursesList.getSelectedValue() != null) {
-                activeSelectionSource = SelectionSource.AVAILABLE;
-                enrolledCoursesList.clearSelection();
-                showCourseInfo(availableCoursesList.getSelectedValue());
-                updateButtonStates();
-            }
-        });
+        availableCoursesList.addListSelectionListener(
+            this::handleAvailableCourseSelectionChanged
+        );
 
         JScrollPane availableScrollPane = new JScrollPane(availableCoursesList);
-        availableScrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
+        availableScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
         availableScrollPane.getViewport().setBackground(UITheme.SURFACE);
 
         availablePanel.add(availableCoursesLabel, BorderLayout.NORTH);
         availablePanel.add(availableScrollPane, BorderLayout.CENTER);
 
         JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new javax.swing.BoxLayout(infoPanel, javax.swing.BoxLayout.Y_AXIS));
+        infoPanel.setLayout(
+            new javax.swing.BoxLayout(infoPanel, javax.swing.BoxLayout.Y_AXIS)
+        );
         infoPanel.setBackground(UITheme.SURFACE);
-        infoPanel.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(UITheme.BORDER),
-            new EmptyBorder(12, 12, 12, 12)
-        ));
+        infoPanel.setBorder(
+            BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(UITheme.BORDER),
+                new EmptyBorder(12, 12, 12, 12)
+            )
+        );
 
         JLabel infoTitleLabel = new JLabel("Course Info");
         infoTitleLabel.setFont(UITheme.BODY_FONT.deriveFont(Font.BOLD, 16f));
@@ -139,12 +148,16 @@ public class CourseManagementPanel extends JPanel {
         infoDescriptionArea.setFont(UITheme.BODY_FONT.deriveFont(14f));
         infoDescriptionArea.setForeground(UITheme.TEXT);
         infoDescriptionArea.setBackground(UITheme.SURFACE);
-        infoDescriptionArea.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(UITheme.BORDER),
-            "Description"
-        ));
+        infoDescriptionArea.setBorder(
+            BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(UITheme.BORDER),
+                "Description"
+            )
+        );
 
-        JScrollPane descriptionScrollPane = new JScrollPane(infoDescriptionArea);
+        JScrollPane descriptionScrollPane = new JScrollPane(
+            infoDescriptionArea
+        );
         descriptionScrollPane.setBorder(null);
         descriptionScrollPane.setPreferredSize(new Dimension(0, 150));
 
@@ -166,37 +179,46 @@ public class CourseManagementPanel extends JPanel {
         enrolledPanel.setBackground(UITheme.BACKGROUND);
 
         enrolledCoursesLabel = new JLabel("Enrolled Courses");
-        enrolledCoursesLabel.setFont(UITheme.BODY_FONT.deriveFont(Font.BOLD, 16f));
+        enrolledCoursesLabel.setFont(
+            UITheme.BODY_FONT.deriveFont(Font.BOLD, 16f)
+        );
         enrolledCoursesLabel.setForeground(UITheme.TEXT);
 
         enrolledCoursesModel = new DefaultListModel<>();
         enrolledCoursesList = new JList<>(enrolledCoursesModel);
-        enrolledCoursesList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        enrolledCoursesList.setSelectionMode(
+            ListSelectionModel.SINGLE_SELECTION
+        );
         enrolledCoursesList.setFont(UITheme.BODY_FONT);
         enrolledCoursesList.setForeground(UITheme.TEXT);
         enrolledCoursesList.setCellRenderer(new CourseListCellRenderer());
-        enrolledCoursesList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && enrolledCoursesList.getSelectedValue() != null) {
-                activeSelectionSource = SelectionSource.ENROLLED;
-                availableCoursesList.clearSelection();
-                showCourseInfo(enrolledCoursesList.getSelectedValue());
-                updateButtonStates();
-            }
-        });
+        enrolledCoursesList.addListSelectionListener(
+            this::handleEnrolledCourseSelectionChanged
+        );
 
         JScrollPane enrolledScrollPane = new JScrollPane(enrolledCoursesList);
-        enrolledScrollPane.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
+        enrolledScrollPane.setBorder(
+            BorderFactory.createLineBorder(UITheme.BORDER)
+        );
         enrolledScrollPane.getViewport().setBackground(UITheme.SURFACE);
 
         enrolledPanel.add(enrolledCoursesLabel, BorderLayout.NORTH);
         enrolledPanel.add(enrolledScrollPane, BorderLayout.CENTER);
 
-        JSplitPane rightSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, infoPanel, enrolledPanel);
+        JSplitPane rightSplitPane = new JSplitPane(
+            JSplitPane.VERTICAL_SPLIT,
+            infoPanel,
+            enrolledPanel
+        );
         rightSplitPane.setResizeWeight(0.62);
         rightSplitPane.setDividerLocation(330);
         rightSplitPane.setBorder(null);
 
-        JSplitPane mainSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, availablePanel, rightSplitPane);
+        JSplitPane mainSplitPane = new JSplitPane(
+            JSplitPane.HORIZONTAL_SPLIT,
+            availablePanel,
+            rightSplitPane
+        );
         mainSplitPane.setResizeWeight(0.58);
         mainSplitPane.setDividerLocation(620);
         mainSplitPane.setBorder(null);
@@ -215,19 +237,19 @@ public class CourseManagementPanel extends JPanel {
 
         enrollButton = new JButton("Enroll Selected");
         UITheme.stylePrimaryButton(enrollButton);
-        enrollButton.addActionListener(e -> enrollSelectedCourse());
+        enrollButton.addActionListener(this::handleEnrollButtonClicked);
 
         dropButton = new JButton("Drop Selected");
         UITheme.styleSecondaryButton(dropButton);
-        dropButton.addActionListener(e -> dropSelectedCourse());
+        dropButton.addActionListener(this::handleDropButtonClicked);
 
         openCourseButton = new JButton("Open Course");
         UITheme.stylePrimaryButton(openCourseButton);
-        openCourseButton.addActionListener(e -> openSelectedCourse());
+        openCourseButton.addActionListener(this::handleOpenCourseButtonClicked);
 
         backButton = new JButton("Back to Home");
         UITheme.styleSecondaryButton(backButton);
-        backButton.addActionListener(e -> parentFrame.showCard("home"));
+        backButton.addActionListener(this::handleBackButtonClicked);
 
         buttonPanel.add(enrollButton);
         buttonPanel.add(BoxUtil.spacer(10, 0));
@@ -265,7 +287,9 @@ public class CourseManagementPanel extends JPanel {
 
         StudentRecord record = profile.getRecord();
         ArrayList<Course> enrolledCourses = record.getEnrolledCourses();
-        ArrayList<Course> catalogCourses = parentFrame.getCourseCatalog().getCourses();
+        ArrayList<Course> catalogCourses = parentFrame
+            .getCourseCatalog()
+            .getCourses();
 
         for (Course course : enrolledCourses) {
             enrolledCoursesModel.addElement(course);
@@ -294,8 +318,10 @@ public class CourseManagementPanel extends JPanel {
         }
 
         statusLabel.setText(
-            enrolledCoursesModel.size() + " enrolled course(s), " +
-            availableCoursesModel.size() + " available course(s)."
+            enrolledCoursesModel.size() +
+                " enrolled course(s), " +
+                availableCoursesModel.size() +
+                " available course(s)."
         );
         updateButtonStates();
     }
@@ -438,9 +464,13 @@ public class CourseManagementPanel extends JPanel {
 
         infoCourseIdValueLabel.setText("Course ID: " + course.getCourseId());
         infoTitleValueLabel.setText("Title: " + course.getTitle());
-        infoInstructorValueLabel.setText("Instructor: " + course.getInstructor());
+        infoInstructorValueLabel.setText(
+            "Instructor: " + course.getInstructor()
+        );
         infoTopicsValueLabel.setText("Topics: " + course.getTopics().length);
-        infoAssignmentsValueLabel.setText("Assignments: " + course.getAssignments().length);
+        infoAssignmentsValueLabel.setText(
+            "Assignments: " + course.getAssignments().length
+        );
         infoDescriptionArea.setText(course.getDescription());
         infoDescriptionArea.setCaretPosition(0);
     }
@@ -448,12 +478,60 @@ public class CourseManagementPanel extends JPanel {
     private void updateButtonStates() {
         StudentProfile profile = parentFrame.getCurrentProfile();
         boolean hasProfile = profile != null && profile.getRecord() != null;
-        boolean hasAvailableSelection = availableCoursesList.getSelectedValue() != null;
-        boolean hasEnrolledSelection = enrolledCoursesList.getSelectedValue() != null;
+        boolean hasAvailableSelection =
+            availableCoursesList.getSelectedValue() != null;
+        boolean hasEnrolledSelection =
+            enrolledCoursesList.getSelectedValue() != null;
 
         enrollButton.setEnabled(hasProfile && hasAvailableSelection);
         dropButton.setEnabled(hasProfile && hasEnrolledSelection);
         openCourseButton.setEnabled(hasProfile && hasEnrolledSelection);
+    }
+
+    private void handleAvailableCourseSelectionChanged(
+        javax.swing.event.ListSelectionEvent event
+    ) {
+        if (
+            !event.getValueIsAdjusting() &&
+            availableCoursesList.getSelectedValue() != null
+        ) {
+            activeSelectionSource = SelectionSource.AVAILABLE;
+            enrolledCoursesList.clearSelection();
+            showCourseInfo(availableCoursesList.getSelectedValue());
+            updateButtonStates();
+        }
+    }
+
+    private void handleEnrolledCourseSelectionChanged(
+        javax.swing.event.ListSelectionEvent event
+    ) {
+        if (
+            !event.getValueIsAdjusting() &&
+            enrolledCoursesList.getSelectedValue() != null
+        ) {
+            activeSelectionSource = SelectionSource.ENROLLED;
+            availableCoursesList.clearSelection();
+            showCourseInfo(enrolledCoursesList.getSelectedValue());
+            updateButtonStates();
+        }
+    }
+
+    private void handleEnrollButtonClicked(java.awt.event.ActionEvent event) {
+        enrollSelectedCourse();
+    }
+
+    private void handleDropButtonClicked(java.awt.event.ActionEvent event) {
+        dropSelectedCourse();
+    }
+
+    private void handleOpenCourseButtonClicked(
+        java.awt.event.ActionEvent event
+    ) {
+        openSelectedCourse();
+    }
+
+    private void handleBackButtonClicked(java.awt.event.ActionEvent event) {
+        parentFrame.showCard("home");
     }
 
     private Course getActiveSelectedCourse() {
@@ -474,25 +552,9 @@ public class CourseManagementPanel extends JPanel {
         return label;
     }
 
-    public JButton getEnrollButton() {
-        return enrollButton;
-    }
-
-    public JButton getDropButton() {
-        return dropButton;
-    }
-
-    public JButton getOpenCourseButton() {
-        return openCourseButton;
-    }
-
-    public JButton getBackButton() {
-        return backButton;
-    }
-
     private static final class BoxUtil {
-        private BoxUtil() {
-        }
+
+        private BoxUtil() {}
 
         private static Component spacer(int width, int height) {
             return new javax.swing.Box.Filler(
@@ -503,7 +565,11 @@ public class CourseManagementPanel extends JPanel {
         }
     }
 
-    private static class CourseListCellRenderer extends JPanel implements javax.swing.ListCellRenderer<Course> {
+    private static class CourseListCellRenderer
+        extends JPanel
+        implements javax.swing.ListCellRenderer<Course>
+    {
+
         private JLabel courseIdLabel;
         private JLabel titleLabel;
         private JLabel instructorLabel;

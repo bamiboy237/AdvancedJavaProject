@@ -4,6 +4,7 @@
  */
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class CourseCatalog implements Serializable {
@@ -19,7 +20,7 @@ public class CourseCatalog implements Serializable {
 
     private void initializeCourses() {
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-101",
                 "Introduction to Computer Science",
                 "Foundations of programming and computational thinking.",
@@ -37,12 +38,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Functions",
                     "Final Project",
                 },
-                "Dr. Smith"
+                "Dr. Smith",
+                0
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-102",
                 "Data Structures",
                 "Arrays, linked lists, stacks, queues, trees, and graphs.",
@@ -60,12 +62,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Binary Tree",
                     "Final Project",
                 },
-                "Dr. Johnson"
+                "Dr. Johnson",
+                1
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-201",
                 "Object-Oriented Programming",
                 "OOP principles: encapsulation, inheritance, polymorphism.",
@@ -83,12 +86,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Inheritance",
                     "Final Project",
                 },
-                "Dr. Williams"
+                "Dr. Williams",
+                2
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-202",
                 "Algorithms",
                 "Algorithm analysis, sorting, searching, and complexity.",
@@ -106,12 +110,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Dynamic Programming",
                     "Final Exam",
                 },
-                "Dr. Brown"
+                "Dr. Brown",
+                3
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "MTH-101",
                 "Discrete Mathematics",
                 "Logic, sets, relations, functions, and combinatorics.",
@@ -129,12 +134,13 @@ public class CourseCatalog implements Serializable {
                     "Problem Set 2",
                     "Final Exam",
                 },
-                "Dr. Davis"
+                "Dr. Davis",
+                4
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "MTH-201",
                 "Linear Algebra",
                 "Vectors, matrices, and linear transformations.",
@@ -152,12 +158,13 @@ public class CourseCatalog implements Serializable {
                     "Homework 2",
                     "Final Exam",
                 },
-                "Dr. Miller"
+                "Dr. Miller",
+                5
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-301",
                 "Database Systems",
                 "Relational databases, SQL, and database design.",
@@ -175,12 +182,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Database Design",
                     "Final Project",
                 },
-                "Dr. Wilson"
+                "Dr. Wilson",
+                6
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-302",
                 "Operating Systems",
                 "Process management, memory, file systems, and concurrency.",
@@ -198,12 +206,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Memory Allocation",
                     "Final Project",
                 },
-                "Dr. Moore"
+                "Dr. Moore",
+                7
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-303",
                 "Computer Networks",
                 "Network layers, protocols, and distributed systems.",
@@ -221,12 +230,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Socket Programming",
                     "Final Project",
                 },
-                "Dr. Taylor"
+                "Dr. Taylor",
+                8
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-304",
                 "Software Engineering",
                 "SDLC, agile, testing, and project management.",
@@ -244,12 +254,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Unit Testing",
                     "Final Project",
                 },
-                "Dr. Anderson"
+                "Dr. Anderson",
+                9
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-305",
                 "Web Development",
                 "HTML, CSS, JavaScript, and web frameworks.",
@@ -267,12 +278,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Interactive App",
                     "Final Project",
                 },
-                "Dr. Thomas"
+                "Dr. Thomas",
+                10
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-306",
                 "Mobile App Development",
                 "Android/iOS development with modern frameworks.",
@@ -290,12 +302,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: REST Integration",
                     "Final Project",
                 },
-                "Dr. Jackson"
+                "Dr. Jackson",
+                11
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-307",
                 "Artificial Intelligence",
                 "Machine learning, neural networks, and AI ethics.",
@@ -313,12 +326,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Neural Network",
                     "Final Project",
                 },
-                "Dr. White"
+                "Dr. White",
+                12
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-308",
                 "Cybersecurity",
                 "Network security, cryptography, and risk management.",
@@ -336,12 +350,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Network Scanning",
                     "Final Project",
                 },
-                "Dr. Harris"
+                "Dr. Harris",
+                13
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-309",
                 "Cloud Computing",
                 "Distributed systems, virtualization, and cloud services.",
@@ -359,12 +374,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Docker",
                     "Final Project",
                 },
-                "Dr. Martin"
+                "Dr. Martin",
+                14
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-310",
                 "Computer Graphics",
                 "2D/3D graphics, rendering, and shader programming.",
@@ -382,12 +398,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: 3D Scene",
                     "Final Project",
                 },
-                "Dr. Thompson"
+                "Dr. Thompson",
+                15
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-311",
                 "Compiler Design",
                 "Lexical analysis, parsing, and code generation.",
@@ -405,12 +422,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Parser",
                     "Final Project",
                 },
-                "Dr. Garcia"
+                "Dr. Garcia",
+                16
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "CSC-312",
                 "Game Development",
                 "Game engines, physics, and interactive design.",
@@ -428,12 +446,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Platformer",
                     "Final Game",
                 },
-                "Dr. Martinez"
+                "Dr. Martinez",
+                17
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "PHY-101",
                 "Physics for Computer Scientists",
                 "Mechanics, electricity, and computing applications.",
@@ -451,12 +470,13 @@ public class CourseCatalog implements Serializable {
                     "Lab 2: Circuits",
                     "Final Exam",
                 },
-                "Dr. Robinson"
+                "Dr. Robinson",
+                18
             )
         );
 
         courses.add(
-            new Course(
+            createCourse(
                 "ENG-101",
                 "Technical Writing",
                 "Communication skills for engineers and developers.",
@@ -474,9 +494,61 @@ public class CourseCatalog implements Serializable {
                     "Assignment 2: Presentation",
                     "Final Project",
                 },
-                "Dr. Clark"
+                "Dr. Clark",
+                19
             )
         );
+    }
+
+    private Course createCourse(
+        String courseId,
+        String title,
+        String description,
+        String[] topics,
+        String[] assignments,
+        String instructor,
+        int scheduleOffset
+    ) {
+        return new Course(
+            courseId,
+            title,
+            description,
+            topics,
+            assignments,
+            createDeadlines(courseId, title, assignments, scheduleOffset),
+            instructor
+        );
+    }
+
+    private ArrayList<CalendarEvent> createDeadlines(
+        String courseId,
+        String courseTitle,
+        String[] assignments,
+        int scheduleOffset
+    ) {
+        ArrayList<CalendarEvent> deadlines = new ArrayList<>();
+        LocalDateTime baseDate = LocalDateTime.now()
+            .withHour(23)
+            .withMinute(59)
+            .withSecond(0)
+            .withNano(0)
+            .plusDays(3L + scheduleOffset);
+
+        for (int i = 0; i < assignments.length; i++) {
+            String assignment = assignments[i];
+            LocalDateTime dueDate = baseDate.plusDays(i * 7L);
+            deadlines.add(
+                new CalendarEvent(
+                    courseId + ": " + assignment,
+                    assignment + " for " + courseTitle,
+                    "Course Deadline",
+                    null,
+                    dueDate
+                )
+            );
+        }
+
+        return deadlines;
     }
 
     public ArrayList<Course> getCourses() {
