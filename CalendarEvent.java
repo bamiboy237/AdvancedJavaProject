@@ -5,6 +5,7 @@
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class CalendarEvent implements Serializable, Comparable<CalendarEvent> {
 
@@ -23,12 +24,15 @@ public class CalendarEvent implements Serializable, Comparable<CalendarEvent> {
         LocalDateTime startDateTime,
         LocalDateTime dueDateTime
     ) {
-        this.title =
-            title == null || title.isBlank() ? "Untitled Event" : title;
-        this.description = description == null ? "" : description;
-        this.location = location == null ? "" : location;
+        this.title = normalize(title, "Untitled Event");
+        this.description = normalize(description, "");
+        this.location = normalize(location, "");
         this.startDateTime = startDateTime;
         this.dueDateTime = dueDateTime;
+    }
+
+    private static String normalize(String value, String defaultValue) {
+        return (value == null || value.isBlank()) ? defaultValue : value;
     }
 
     public String getTitle() {
@@ -83,5 +87,34 @@ public class CalendarEvent implements Serializable, Comparable<CalendarEvent> {
             builder.append(" @ ").append(location);
         }
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof CalendarEvent)) {
+            return false;
+        }
+        CalendarEvent that = (CalendarEvent) o;
+        return (
+            Objects.equals(title, that.title) &&
+            Objects.equals(description, that.description) &&
+            Objects.equals(location, that.location) &&
+            Objects.equals(startDateTime, that.startDateTime) &&
+            Objects.equals(dueDateTime, that.dueDateTime)
+        );
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+            title,
+            description,
+            location,
+            startDateTime,
+            dueDateTime
+        );
     }
 }

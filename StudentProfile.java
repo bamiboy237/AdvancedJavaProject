@@ -15,11 +15,20 @@ public class StudentProfile implements Serializable {
     private String studentId;
     private StudentRecord record;
 
-    public StudentProfile(String firstName, String lastName, String studentId, StudentRecord record) {
-        this.firstName = firstName == null ? "" : firstName.trim();
-        this.lastName = lastName == null ? "" : lastName.trim();
+    public StudentProfile(
+        String firstName,
+        String lastName,
+        String studentId,
+        StudentRecord record
+    ) {
+        this.firstName = normalize(firstName);
+        this.lastName = normalize(lastName);
         this.studentId = studentId;
         this.record = record;
+    }
+
+    private static String normalize(String value) {
+        return (value == null) ? "" : value.trim();
     }
 
     public String getFirstName() {
@@ -27,7 +36,7 @@ public class StudentProfile implements Serializable {
     }
 
     public void setFirstName(String firstName) {
-        this.firstName = firstName == null ? "" : firstName.trim();
+        this.firstName = normalize(firstName);
     }
 
     public String getLastName() {
@@ -35,7 +44,7 @@ public class StudentProfile implements Serializable {
     }
 
     public void setLastName(String lastName) {
-        this.lastName = lastName == null ? "" : lastName.trim();
+        this.lastName = normalize(lastName);
     }
 
     public StudentRecord getRecord() {

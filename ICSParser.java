@@ -10,10 +10,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.time.temporal.Temporal;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
@@ -65,7 +65,13 @@ public class ICSParser {
             dueDateTime = startDateTime;
         }
 
-        return new CalendarEvent(title, description, location, startDateTime, dueDateTime);
+        return new CalendarEvent(
+            title,
+            description,
+            location,
+            startDateTime,
+            dueDateTime
+        );
     }
 
     private String readSummary(VEvent vevent) {
@@ -83,7 +89,9 @@ public class ICSParser {
         return location == null ? "" : location.getValue();
     }
 
-    private LocalDateTime readDateTime(net.fortuna.ical4j.model.property.DateProperty<?> property) {
+    private LocalDateTime readDateTime(
+        net.fortuna.ical4j.model.property.DateProperty<?> property
+    ) {
         if (property == null || property.getDate() == null) {
             return null;
         }
@@ -104,8 +112,14 @@ public class ICSParser {
             return zonedDateTime.toLocalDateTime();
         }
         if (temporal instanceof java.time.Instant instant) {
-            return ZonedDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDateTime();
+            return ZonedDateTime.ofInstant(
+                instant,
+                ZoneId.systemDefault()
+            ).toLocalDateTime();
         }
-        return LocalDateTime.ofInstant(java.time.Instant.from(temporal), ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(
+            java.time.Instant.from(temporal),
+            ZoneId.systemDefault()
+        );
     }
 }

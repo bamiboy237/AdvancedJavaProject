@@ -1,103 +1,59 @@
-# MiniLMS Java Swing Project
+# MiniLMS
 
-MiniLMS is a local desktop learning management system built with Java Swing. It lets a student:
+MiniLMS is a local desktop learning management system built with Java Swing.
 
-- create and select a local profile
-- sign in with password
-- view enrolled courses
-- enroll in and drop courses
-- open course content
-- import `.ics` calendar files
-- see combined course deadlines and imported calendar events
+## What it does
 
-## Application Flow
+- Create and sign in with local profiles
+- Enroll in and drop courses
+- View course content
+- Track deadlines from built-in courses and imported `.ics` files
+- See upcoming items in a calendar view
 
-```text
-+-------------------+
-|   Launch App      |
-|  MiniLMSApp.main  |
-+---------+---------+
-          |
-          v
-+-------------------+
-|    Welcome UI     |
-| Sign In / Sign Up |
-+---------+---------+
-          |
-          v
-+-------------------+
-| Profile Selection |
-|  or Creation UI   |
-+---------+---------+
-          |
-          v
-+-------------------+
-|   Main LMS Frame  |
-|  MiniLMSFrame     |
-+----+----+----+----+
-     |    |    | 
-     |    |    +-------------------+
-     |    |                        |
-     |    v                        v
-     |  Course Content         Calendar View
-     |  Panel                  - imported .ics events
-     |  - course title         - course deadlines
-     |  - topics               - upcoming list
-     |  - assignments
-     |  - deadlines
-     |
-     v
-+-------------------+
-| Course Management |
-| enroll / drop /   |
-| open course       |
-+-------------------+
+## Project structure
 
-Home panel shows enrolled courses and upcoming deadlines.
-Saving happens automatically on important actions and exit.
+Key files:
+
+- `MiniLMSApp.java` — application entry point
+- `MiniLMSFrame.java` — main window and screen navigation
+- `WelcomePanel.java`, `ProfileSelectionPanel.java`, `ProfileCreationPanel.java` — profile flow
+- `HomePanel.java` — dashboard
+- `CourseManagementPanel.java`, `CourseContentPanel.java` — course screens
+- `CalendarPanel.java` — calendar and upcoming items
+- `PersistenceManager.java` — local profile storage in `data/`
+- `ICSParser.java` — imports `.ics` calendar files
+- `UITheme.java` — shared styling
+
+## Requirements
+
+- Java installed
+- Third-party JARs in `lib/`
+
+The `ICSParser` depends on ical4j and its transitive dependencies.
+
+## Get dependencies
+
+Run the helper script from the project root:
+
+```bash
+./scripts/fetch_libs.sh
 ```
 
-## How to Run
+This creates `lib/` if needed and downloads the required JARs from Maven Central.
 
-From the `AdvancedJavaProject` directory:
+## Compile and run
 
-```text
+From the project root:
+
+```bash
 javac -cp .:lib/* *.java
 java -cp .:lib/* MiniLMSApp
 ```
 
-If your environment already has compiled `.class` files, you can run the app directly with the `java` command above.
+On Windows, replace `:` with `;` in the classpath.
 
-## Project Files
+## Notes
 
-### Main application
-- `MiniLMSApp.java` — application entry point; launches the Swing UI.
-- `MiniLMSFrame.java` — main window, navigation hub, menus, save/load coordination.
-
-### Data/model classes
-- `StudentProfile.java` — local student identity and saved record container.
-- `StudentRecord.java` — enrolled courses and calendar events.
-- `Course.java` — course data, assignments, and deadlines.
-- `CalendarEvent.java` — one calendar/deadline item.
-- `ProfileIndex.java` — list of stored profiles.
-- `StudentIdGenerator.java` — creates new student IDs.
-
-### Course and calendar logic
-- `CourseCatalog.java` — built-in catalog of sample courses with deadlines.
-- `ICSParser.java` — parses imported `.ics` files into calendar events.
-
-### Persistence
-- `PersistenceManager.java` — saves and loads profiles and profile index using serialization.
-- `data/` — stored profile and index files.
-
-### UI panels
-- `WelcomePanel.java` — first screen with sign-in and sign-up choices.
-- `ProfileSelectionPanel.java` — lets the user pick an existing profile.
-- `ProfileCreationPanel.java` — creates a new local profile.
-- `HomePanel.java` — dashboard showing enrolled courses and upcoming deadlines.
-- `CourseManagementPanel.java` — enroll, drop, and inspect courses.
-- `CourseContentPanel.java` — view selected course details, topics, assignments, and deadlines.
-- `CalendarPanel.java` — calendar UI for course deadlines and imported `.ics` events.
-
-### Shared styling
-- `UITheme.java` — colors, fonts, and common Swing styling helpers.
+- Data is stored locally in `data/`
+- The app uses a simple CardLayout-based flow
+- Imported `.ics` events are combined with course deadlines in the calendar

@@ -80,9 +80,6 @@ public class Course implements Serializable {
     }
 
     public ArrayList<CalendarEvent> getDeadlines() {
-        if (deadlines == null) {
-            return new ArrayList<>();
-        }
         return new ArrayList<>(deadlines);
     }
 
